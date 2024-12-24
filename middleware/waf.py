@@ -3,7 +3,7 @@ from typing import Callable
 from middleware.database import add_log, add_alert
 import re
 
-SQLI_PATTERNS = re.compile(r'\b(?:OR\s*\d*\s*=\s*\d*|--|;|UNION\s+SELECT|(?:AND|OR)\s*[\w\s][=<>]+\s*[\w\s\'])\b|\b(?:SELECT|UNION|INSERT|UPDATE|DELETE|FROM|WHERE)\b', re.IGNORECASE)
+SQLI_PATTERNS = re.compile(r"(\b(?:OR|AND)\s*\d*\s*(?:=\s*\d*|LIKE)\s*|--\s*|\b(?:SELECT|UNION|INSERT|UPDATE|DELETE|DROP|FROM|WHERE|AND)\b)", re.IGNORECASE)
 XSS_PATTERNS = re.compile(r'(<\s*script\s*.*?>.*?</\s*script\s*>)|(\bon\w+\s*=\s*["\'].*?["\'])', re.IGNORECASE)
 
 def wafCheck(payload: str):
