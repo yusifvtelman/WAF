@@ -1,26 +1,21 @@
 from fastapi import Request
-from collections import deque
 from typing import Callable
-
-MAX_LOGS = 1000
-logs = deque(maxlen=MAX_LOGS)
+from middleware.database import add_log
 
 async def logger(request: Request, call_next: Callable):
+    """
+    Middleware to log incoming requests.
+    """
+
     client_ip = request.client.host
     path = request.url.path
     method = request.method
 
+    body = await request.body()
+    payload = body.decode("utf-8") if body else None
+
+
+    add_log(client_ip=client_ip, path=path, method=method, payload=payload)
+
     response = await call_next(request)
-    status_code = response.status_code
-
-    log_entry = {
-        "client_ip": client_ip,
-        "path": path,
-        "method": method,
-        "status_code": status_code,
-    }
-    logs.append(log_entry)
     return response
-
-def get_logs(limit: int = 10):
-    return list(logs)[-limit:]
