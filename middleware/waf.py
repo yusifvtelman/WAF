@@ -6,11 +6,14 @@ import re
 SQLI_PATTERNS = re.compile(r'\b(?:OR\s*\d*\s*=\s*\d*|--|;|UNION\s+SELECT|(?:AND|OR)\s*[\w\s][=<>]+\s*[\w\s\'])\b|\b(?:SELECT|UNION|INSERT|UPDATE|DELETE|FROM|WHERE)\b', re.IGNORECASE)
 XSS_PATTERNS = re.compile(r'(<\s*script\s*.*?>.*?</\s*script\s*>)|(\bon\w+\s*=\s*["\'].*?["\'])', re.IGNORECASE)
 
-def wafCheck(request):
-    if SQLI_PATTERNS.search(request):
+def wafCheck(payload: str):
+    """
+    Checks for SQL Injection or XSS patterns in the request body (payload).
+    """
+    if SQLI_PATTERNS.search(payload):
         return "SQL Injection"
     
-    if XSS_PATTERNS.search(request):
+    if XSS_PATTERNS.search(payload):
         return "XSS"
     
     return None
@@ -24,9 +27,9 @@ async def logger(request: Request, call_next: Callable):
     path = request.url.path
     method = request.method
     body = await request.body()
-    payload = body.decode("utf-8") if body else None
+    payload = body.decode("utf-8") if body else ""
 
-    attack = wafCheck(request.url.path)
+    attack = wafCheck(payload)
     if attack:
         add_alert(client_ip=client_ip, path=path, method=method, payload=payload, attack=attack)
 
