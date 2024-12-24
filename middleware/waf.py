@@ -29,9 +29,10 @@ async def logger(request: Request, call_next: Callable):
     body = await request.body()
     payload = body.decode("utf-8") if body else ""
 
-    attack = wafCheck(payload)
-    if attack:
-        add_alert(client_ip=client_ip, path=path, method=method, payload=payload, attack=attack)
+    if method == "POST":
+        attack = wafCheck(payload)
+        if attack:
+            add_alert(client_ip=client_ip, path=path, method=method, payload=payload, attack=attack)
 
     add_log(client_ip=client_ip, path=path, method=method, payload=payload)
 
