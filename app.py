@@ -2,8 +2,8 @@ from fastapi import FastAPI, Request, Form, Depends
 from fastapi.responses import HTMLResponse, RedirectResponse
 from fastapi.templating import Jinja2Templates
 from sqlalchemy.orm import Session
-from middleware.database import get_db, User, init_db , get_logs
-from middleware.log import logger
+from middleware.database import get_db, User, init_db , get_logs, get_alerts
+from middleware.waf import logger
 import uvicorn
 
 app = FastAPI()
@@ -45,6 +45,14 @@ async def fetch_logs(limit: int = 10):
     :param limit: Number of logs to fetch.
     """
     return get_logs(limit=limit)
+
+@app.get("/alerts")
+async def fetch_alerts(limit: int = 10):
+    """
+    Fetch recent alerts.
+    :param limit: Number of alerts to fetch.
+    """
+    return get_alerts(limit=limit)
 
 if __name__ == "__main__":
     uvicorn.run("app:app", host="127.0.0.1", port=8000, reload=True)

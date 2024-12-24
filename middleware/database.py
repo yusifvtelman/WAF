@@ -22,7 +22,18 @@ class Log(Base):
     client_ip = Column(String)
     path = Column(String)
     method = Column(String)
+    payload = Column(String, nullable=True)
     suspicious = Column(Boolean, default=False)
+    timestamp = Column(DateTime, default=func.now())
+
+class Alert(Base):
+    __tablename__ = "alerts"
+
+    id = Column(Integer, primary_key=True, index=True)
+    client_ip = Column(String)
+    path = Column(String)
+    method = Column(String)
+    attack = Column(String)
     payload = Column(String, nullable=True)
     timestamp = Column(DateTime, default=func.now())
 
@@ -43,10 +54,21 @@ def add_log(client_ip: str, path: str, method: str, payload: str):
         session.add(log)
         session.commit()
 
+def add_alert(client_ip: str, path: str, method: str, payload: str, attack: str):
+    with SessionLocal() as session:
+        alert = Alert(client_ip=client_ip, path=path, method=method, payload=payload, attack=attack)
+        session.add(alert)
+        session.commit()
+
 def get_logs(limit: int = 10):
     with SessionLocal() as session:
         logs = session.query(Log).order_by(Log.timestamp.desc()).limit(limit).all()
         return logs
-    
+
+def get_alerts(limit: int = 10):
+    with SessionLocal() as session:
+        alerts = session.query(Alert).order_by(Alert.timestamp.desc()).limit(limit).all()
+        return alerts
+
 if __name__ == "__main__":
     init_db()
