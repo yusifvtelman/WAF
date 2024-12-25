@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Alerts</title>
+</head>
+<body>
+    <h2>Recent Alerts</h2>
+    {% if alerts %}
+        <ul>
+        {% for alert in alerts %}
+            <li>
+                <strong>IP:</strong> {{ alert.client_ip }} <br>
+                <strong>Path:</strong> {{ alert.path }} <br>
+                <strong>Method:</strong> {{ alert.method }} <br>
+                <strong>Payload:</strong> {{ alert.payload }} <br>
+                <strong>Attack Type:</strong> {{ alert.attack }} <br>
+                <strong>Timestamp:</strong> {{ alert.timestamp }} <br>
+                <hr>
+            </li>
+        {% endfor %}
+        </ul>
+    {% else %}
+        <p>No alerts found.</p>
+    {% endif %}
+</body>
+</html>
